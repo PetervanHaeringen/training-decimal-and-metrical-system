@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Metriek Stelsel Oefenen</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script>
+        function speelGeluid(geluid) {
+            var audio = new Audio(geluid);
+            audio.play();
+        }
+    </script>
     <style>
         body {
             padding: 20px;
@@ -28,6 +34,9 @@
         
         {% if resultaat %}
             <div class="alert alert-info">{{ resultaat }}</div>
+            {% if 'goed' in resultaat.lower() %}
+                <script>speelGeluid("success.wav");</script>
+            {% endif %}
         {% endif %}
         
         <p class="text-center">Behaalde punten: {{ punten }}</p>
@@ -38,28 +47,24 @@
             <p>{{ eenheden | join(' | ') }}</p>
         </div>
         
-        <form method="POST" class="text-center">
-            {% if huidige_categorie == 'decimal' %}
-                <p>{{ question }}</p>
-                <input type="hidden" name="question" value="{{ question }}">
-                <input type="hidden" name="correct_answer" value="{{ correct_answer }}">
-                <input type="hidden" name="exercise_type" value="{{ exercise_type }}">
-            {% else %}
+        {% if finale %}
+            <div class="alert alert-success text-center">
+                <h2>Gefeliciteerd! Je hebt alles voltooid! 🎉</h2>
+                <script>speelGeluid("finale.mp3");</script>
+                <a href="/reset" class="btn btn-success">Opnieuw Oefenen</a>
+            </div>
+        {% else %}
+            <form method="POST" class="text-center">
                 <p>Converteer {{ waarde }} {{ bron_eenheid }} naar {{ doel_eenheid }}:</p>
                 <input type="hidden" name="bron_eenheid" value="{{ bron_eenheid }}">
                 <input type="hidden" name="doel_eenheid" value="{{ doel_eenheid }}">
                 <input type="hidden" name="waarde" value="{{ waarde }}">
-            {% endif %}
-            
-            <label for="antwoord" class="form-label">Jouw antwoord:</label>
-            <input type="text" id="antwoord" name="antwoord" class="form-control" required>
-            <button type="submit" name="controleer" class="btn btn-primary">Controleer</button>
-        </form>
-    </div><br><br>
-    <center><form action="https://www.paypal.com/donate" method="post" target="_top">
-<input type="hidden" name="hosted_button_id" value="E94JJW9GMNZ8L" />
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-<img alt="" border="0" src="https://www.paypal.com/en_NL/i/scr/pixel.gif" width="1" height="1" />
-</form></center>
+                
+                <label for="antwoord" class="form-label">Jouw antwoord:</label>
+                <input type="number" step="any" id="antwoord" name="antwoord" class="form-control" required>
+                <button type="submit" name="controleer" class="btn btn-primary">Controleer</button>
+            </form>
+        {% endif %}
+    </div>
 </body>
 </html>

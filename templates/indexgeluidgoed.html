@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metriek Stelsel Oefenen</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #0d6efd;
+        }
+        .btn-primary {
+            margin-top: 10px;
+        }
+        .eenheden-overzicht {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Metriek Stelsel Oefenen</h1>
+
+        <!-- Audio-elementen voor geluiden -->
+        <audio id="succes-geluid" src="{{ url_for('static', filename='audio/succes.mp3') }}"></audio>
+        <audio id="categorie-geluid" src="{{ url_for('static', filename='audio/categorie.mp3') }}"></audio>
+        <audio id="final-geluid" src="{{ url_for('static', filename='audio/final.mp3') }}"></audio>
+
+        {% if resultaat %}
+            <div class="alert alert-info">{{ resultaat }}</div>
+        {% endif %}
+
+        <p class="text-center"><strong>Behaalde punten:</strong> {{ punten }}</p>
+        <p class="text-center"><strong>Huidige categorie:</strong> {{ huidige_categorie }}</p>
+
+        <div class="eenheden-overzicht text-center">
+            <p><strong>Overzicht eenheden:</strong></p>
+            <p>{{ eenheden | join(' | ') }}</p>
+        </div>
+
+        <form method="POST" class="text-center">
+            <p>Converteer <strong>{{ waarde }} {{ bron_eenheid }}</strong> naar <strong>{{ doel_eenheid }}</strong>:</p>
+            
+            <input type="hidden" name="bron_eenheid" value="{{ bron_eenheid }}">
+            <input type="hidden" name="doel_eenheid" value="{{ doel_eenheid }}">
+            <input type="hidden" name="waarde" value="{{ waarde }}">
+
+            <label for="antwoord" class="form-label">Jouw antwoord:</label>
+            <input type="number" step="any" id="antwoord" name="antwoord" class="form-control" required>
+            
+            <button type="submit" name="controleer" class="btn btn-primary">Controleer</button>
+        </form>
+    </div>
+
+    <script>
+        // Functie om geluid af te spelen
+        function speelGeluid(geluidId) {
+            const geluid = document.getElementById(geluidId);
+            if (geluid) {
+                geluid.play();
+            }
+        }
+
+        // Controleer of er een geluid moet worden afgespeeld
+        const resultaat = "{{ resultaat }}";
+        const punten = {{ punten }};
+        const categorien = ['lengte', 'oppervlakte', 'inhoud'];
+        const huidigeCategorie = "{{ huidige_categorie }}";
+
+        if (resultaat.includes("Zo Slim!") || resultaat.includes("Goed van je!") || resultaat.includes("Briljant!") || resultaat.includes("Jij bent gewoon heel goed!") || resultaat.includes("Verbluffend!") || resultaat.includes("Geniaal!") || resultaat.includes("Nog even en je bent EindBaasMetriek!")) {
+            speelGeluid('succes-geluid');
+        }
+
+        if (punten % 5 === 0 && punten > 0) {
+            speelGeluid('categorie-geluid');
+        }
+
+        // Controleer of alle categorieën zijn voltooid
+        const voltooideCategorieen = Math.floor(punten / 5);
+        if (voltooideCategorieen >= categorien.length) {
+            speelGeluid('final-geluid');
+            alert("Gefeliciteerd! Je hebt gewoon de Hele Opdracht  Voltooid Hierbij verklaar ik je tot Master Metriek!");
+        }
+    </script>
+</body>
+</html>
